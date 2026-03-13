@@ -1,0 +1,12 @@
+*.src.rpm
+*.rpm
+*.tar.gz
+*.tgz
+*.spec
+*.xml
+.copr/*.src.rpm
+.copr/*.rpm
+.copr/*.tar.gz
+.copr/*.tgz
+.copr/*.spec
+.copr/php-qpack-*/
