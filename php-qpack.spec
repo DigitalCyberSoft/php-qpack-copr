@@ -97,6 +97,9 @@ make install INSTALL_ROOT=%{buildroot}
 install -d %{buildroot}%{php_ztsinidir}
 cp %{buildroot}%{php_inidir}/%{ini_name} \
    %{buildroot}%{php_ztsinidir}/%{ini_name}
+%else
+# Remove any ZTS files that NTS make install may have created
+find %{buildroot} -name "%{pecl_name}.so" -not -path "%{buildroot}%{php_extdir}/*" -delete 2>/dev/null || :
 %endif
 
 # Install headers for devel package

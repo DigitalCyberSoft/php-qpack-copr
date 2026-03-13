@@ -124,6 +124,9 @@ srpm:
 	echo 'install -d %{buildroot}%{php_ztsinidir}'; \
 	echo 'cp %{buildroot}%{php_inidir}/%{ini_name} \'; \
 	echo '   %{buildroot}%{php_ztsinidir}/%{ini_name}'; \
+	echo '%else'; \
+	echo '# Remove any ZTS files that NTS make install may have created'; \
+	echo 'find %{buildroot} -name "%{pecl_name}.so" -not -path "%{buildroot}%{php_extdir}/*" -delete 2>/dev/null || :'; \
 	echo '%endif'; \
 	echo ''; \
 	echo '# Install headers for devel package'; \
