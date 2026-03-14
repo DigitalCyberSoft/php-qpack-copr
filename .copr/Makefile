@@ -14,8 +14,7 @@ srpm:
 	@echo "Output directory: $(outdir)"
 	@echo "Working directory: $$(pwd)"
 
-	# Install php-devel for phpize and php-config
-	dnf -y install php-devel
+
 
 	# Download php-qpack source
 	@echo "=== Downloading php-qpack $(QPACK_VERSION) ==="
