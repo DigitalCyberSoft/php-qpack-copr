@@ -4,8 +4,8 @@
 # COPR provides outdir, set default for local testing
 outdir ?= .
 
-# php-qpack version (latest release)
-QPACK_VERSION = 1.0.0
+# Fetch latest release version from GitHub
+QPACK_VERSION := $(shell curl -s https://api.github.com/repos/DigitalCyberSoft/php-qpack/releases/latest | sed -n 's/.*"tag_name": *"\([^"]*\)".*/\1/p')
 QPACK_URL = https://github.com/DigitalCyberSoft/php-qpack/archive/refs/tags/$(QPACK_VERSION).tar.gz
 
 # Default target for COPR
