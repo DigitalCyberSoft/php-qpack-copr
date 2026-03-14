@@ -14,16 +14,20 @@ srpm:
 	@echo "Output directory: $(outdir)"
 	@echo "Working directory: $$(pwd)"
 
-	# Install php-devel for version macros (php_major_version, php_minor_version)
+	# Install php-devel for phpize and php-config
 	dnf -y install php-devel
 
 	# Download php-qpack source
 	@echo "=== Downloading php-qpack $(QPACK_VERSION) ==="
 	curl -L -o php-qpack-$(QPACK_VERSION).tar.gz $(QPACK_URL) || exit 1
 
+	# Get PHP version from php-config
+	PHP_VER=$$(php-config --version); echo "  PHP version: $$PHP_VER"
+
 	# Generate spec file
 	@echo "=== Generating spec file ==="
-	@( \
+	@PHP_VER=$$(php-config --version); \
+	( \
 	echo '# we dont want -z defs linker flag'; \
 	echo '%undefine _strict_symbol_defs_build'; \
 	echo ''; \
@@ -33,7 +37,7 @@ srpm:
 	echo ''; \
 	echo 'Name:           php-%{pecl_name}'; \
 	echo 'Version:        $(QPACK_VERSION)'; \
-	echo 'Release:        1.php%{php_major_version}%{php_minor_version}%{?dist}'; \
+	echo "Release:        1.php$${PHP_VER}%{?dist}"; \
 	echo 'Summary:        QPACK header compression extension for PHP (RFC 9204)'; \
 	echo ''; \
 	echo 'License:        MIT'; \
