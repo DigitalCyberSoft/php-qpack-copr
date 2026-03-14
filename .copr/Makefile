@@ -10,7 +10,6 @@ QPACK_URL = https://github.com/DigitalCyberSoft/php-qpack/archive/refs/tags/v$(Q
 
 # Default target for COPR
 srpm:
-	dnf -y install php-devel
 	@echo "=== Starting php-qpack SRPM build ==="
 	@echo "Output directory: $(outdir)"
 	@echo "Working directory: $$(pwd)"
@@ -33,7 +32,7 @@ srpm:
 	echo ''; \
 	echo 'Name:           php-%{pecl_name}'; \
 	echo 'Version:        $(QPACK_VERSION)'; \
-	echo 'Release:        1.php%{php_version}%{?dist}'; \
+	echo 'Release:        1%{?dist}'; \
 	echo 'Summary:        QPACK header compression extension for PHP (RFC 9204)'; \
 	echo ''; \
 	echo 'License:        MIT'; \
