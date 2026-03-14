@@ -7,6 +7,7 @@ outdir ?= .
 # Fetch latest release version from GitHub
 QPACK_VERSION := $(shell curl -s https://api.github.com/repos/DigitalCyberSoft/php-qpack/releases/latest | sed -n 's/.*"tag_name": *"v\?\([^"]*\)".*/\1/p')
 QPACK_URL = https://github.com/DigitalCyberSoft/php-qpack/archive/refs/tags/v$(QPACK_VERSION).tar.gz
+RELEASE := $(shell cat $(CURDIR)/release 2>/dev/null || echo 1)
 
 # Default target for COPR
 srpm:
@@ -32,7 +33,7 @@ srpm:
 	echo ''; \
 	echo 'Name:           php-%{pecl_name}'; \
 	echo 'Version:        $(QPACK_VERSION)'; \
-	echo 'Release:        1%{?dist}'; \
+	echo 'Release:        $(RELEASE)%{?dist}'; \
 	echo 'Summary:        QPACK header compression extension for PHP (RFC 9204)'; \
 	echo ''; \
 	echo 'License:        MIT'; \
