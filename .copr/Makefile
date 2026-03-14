@@ -21,13 +21,9 @@ srpm:
 	@echo "=== Downloading php-qpack $(QPACK_VERSION) ==="
 	curl -L -o php-qpack-$(QPACK_VERSION).tar.gz $(QPACK_URL) || exit 1
 
-	# Get PHP version from php-config
-	PHP_VER=$$(php-config --version); echo "  PHP version: $$PHP_VER"
-
 	# Generate spec file
 	@echo "=== Generating spec file ==="
-	@PHP_VER=$$(php-config --version); \
-	( \
+	@( \
 	echo '# we dont want -z defs linker flag'; \
 	echo '%undefine _strict_symbol_defs_build'; \
 	echo ''; \
@@ -37,7 +33,7 @@ srpm:
 	echo ''; \
 	echo 'Name:           php-%{pecl_name}'; \
 	echo 'Version:        $(QPACK_VERSION)'; \
-	echo "Release:        1.php$${PHP_VER}%{?dist}"; \
+	echo 'Release:        1.php%{php_version}%{?dist}'; \
 	echo 'Summary:        QPACK header compression extension for PHP (RFC 9204)'; \
 	echo ''; \
 	echo 'License:        MIT'; \
