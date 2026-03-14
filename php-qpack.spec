@@ -6,7 +6,7 @@
 %global ini_name    40-%{pecl_name}.ini
 
 # Latest release version - update this to build a new version
-%global upstream_version 1.0.0
+%global upstream_version 1.0.1
 
 Name:           php-%{pecl_name}
 Version:        %{upstream_version}
@@ -147,6 +147,9 @@ REPORT_EXIT_STATUS=1 \
 %{php_incldir}/ext/%{pecl_name}
 
 %changelog
+* Sat Mar 14 2026 James Campbell - 1.0.1-1
+- Version bump to 1.0.1
+
 * Fri Mar 13 2026 James Campbell - 1.0.0-1
 - Initial package
 - QPACK header compression for HTTP/3 (RFC 9204)
