@@ -5,8 +5,8 @@
 outdir ?= .
 
 # Fetch latest release version from GitHub
-QPACK_VERSION := $(shell curl -s https://api.github.com/repos/DigitalCyberSoft/php-qpack/releases/latest | sed -n 's/.*"tag_name": *"\([^"]*\)".*/\1/p')
-QPACK_URL = https://github.com/DigitalCyberSoft/php-qpack/archive/refs/tags/$(QPACK_VERSION).tar.gz
+QPACK_VERSION := $(shell curl -s https://api.github.com/repos/DigitalCyberSoft/php-qpack/releases/latest | sed -n 's/.*"tag_name": *"v\?\([^"]*\)".*/\1/p')
+QPACK_URL = https://github.com/DigitalCyberSoft/php-qpack/archive/refs/tags/v$(QPACK_VERSION).tar.gz
 
 # Default target for COPR
 srpm:
@@ -17,13 +17,6 @@ srpm:
 	# Download php-qpack source
 	@echo "=== Downloading php-qpack $(QPACK_VERSION) ==="
 	curl -L -o php-qpack-$(QPACK_VERSION).tar.gz $(QPACK_URL) || exit 1
-
-	# Extract and prepare source
-	@echo "=== Preparing source ==="
-	tar xzf php-qpack-$(QPACK_VERSION).tar.gz || exit 1
-	mv php-qpack-$(QPACK_VERSION) php-qpack-temp
-	tar czf php-qpack-$(QPACK_VERSION).tar.gz php-qpack-temp/ --transform='s/php-qpack-temp/php-qpack-$(QPACK_VERSION)/' || exit 1
-	rm -rf php-qpack-temp/
 
 	# Generate spec file
 	@echo "=== Generating spec file ==="
