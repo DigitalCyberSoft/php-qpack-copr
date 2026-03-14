@@ -1,0 +1,5 @@
+*.tar.gz
+*.spec
+*.src.rpm
+*.xml
+*.rpm

@@ -30,7 +30,7 @@ srpm:
 	echo ''; \
 	echo 'Name:           php-%{pecl_name}'; \
 	echo 'Version:        $(QPACK_VERSION)'; \
-	echo 'Release:        1%{?dist}'; \
+	echo 'Release:        1.php%{php_major_version}%{php_minor_version}%{?dist}'; \
 	echo 'Summary:        QPACK header compression extension for PHP (RFC 9204)'; \
 	echo ''; \
 	echo 'License:        MIT'; \
