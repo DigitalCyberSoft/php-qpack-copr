@@ -10,6 +10,7 @@ QPACK_URL = https://github.com/DigitalCyberSoft/php-qpack/archive/refs/tags/v$(Q
 
 # Default target for COPR
 srpm:
+	dnf -y install php-devel
 	@echo "=== Starting php-qpack SRPM build ==="
 	@echo "Output directory: $(outdir)"
 	@echo "Working directory: $$(pwd)"
