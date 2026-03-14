@@ -13,6 +13,9 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 VERSIONS_FILE="$SCRIPT_DIR/php_version.json"
+RELEASE_FILE="$SCRIPT_DIR/release"
+EXT_VERSION_FILE="$SCRIPT_DIR/ext_version"
+EXT_GITHUB_REPO="DigitalCyberSoft/php-qpack"
 
 # Fedora releases to monitor (space-separated)
 FEDORA_RELEASES="f41 f42 rawhide"
@@ -147,17 +150,31 @@ ENTRY
 FOOTER
 }
 
+# Check if extension version has changed on GitHub
+check_ext_version() {
+    local new_ver
+    new_ver=$(curl -sf "https://api.github.com/repos/${EXT_GITHUB_REPO}/releases/latest" 2>/dev/null | sed -n 's/.*"tag_name": *"v\?\([^"]*\)".*/\1/p')
+    if [ -z "$new_ver" ]; then echo "  Extension version: unknown (API error)"; return 1; fi
+    local saved_ver=""
+    if [ -f "$EXT_VERSION_FILE" ]; then saved_ver=$(cat "$EXT_VERSION_FILE" | tr -d '[:space:]'); fi
+    echo "  Extension version: ${new_ver} [saved: ${saved_ver:-none}]"
+    if [ "$new_ver" != "$saved_ver" ] && [ -n "$saved_ver" ]; then
+        echo "  Extension UPDATED: ${saved_ver} -> ${new_ver} (resetting release to 1)"
+        echo "1" > "$RELEASE_FILE"; echo "$new_ver" > "$EXT_VERSION_FILE"; return 0
+    fi
+    echo "$new_ver" > "$EXT_VERSION_FILE"; return 1
+}
+
 # Bump the release counter
 bump_release() {
-    local release_file="$SCRIPT_DIR/release"
     local current=1
 
-    if [ -f "$release_file" ]; then
-        current=$(cat "$release_file" | tr -d '[:space:]')
+    if [ -f "$RELEASE_FILE" ]; then
+        current=$(cat "$RELEASE_FILE" | tr -d '[:space:]')
         current=$((current + 1))
     fi
 
-    echo "$current" > "$release_file"
+    echo "$current" > "$RELEASE_FILE"
     echo "  Release bumped to: $current"
 }
 
@@ -172,9 +189,9 @@ commit_and_push() {
         git config user.email "bot@github-actions"
     fi
 
-    git add php_version.json release
+    git add php_version.json release ext_version
 
-    local commit_msg="Auto-update: PHP version change detected
+    local commit_msg="Auto-update: version change detected
 
 ${changes}
 This commit triggers automatic COPR rebuild for the new PHP version.
@@ -193,6 +210,15 @@ echo
 
 VERSIONS_CHANGED=0
 CHANGE_SUMMARY=""
+EXT_VERSION_CHANGED=0
+
+echo "Checking extension version..."
+if check_ext_version; then
+    EXT_VERSION_CHANGED=1
+    VERSIONS_CHANGED=1
+    CHANGE_SUMMARY="${CHANGE_SUMMARY}  Extension version updated (release reset to 1)\n"
+fi
+echo
 
 for release in $FEDORA_RELEASES; do
     echo "Checking ${release}..."
@@ -240,8 +266,12 @@ if [ $VERSIONS_CHANGED -eq 1 ]; then
             write_versions
             echo "php_version.json updated"
 
-            echo "Bumping release counter..."
-            bump_release
+            if [ $EXT_VERSION_CHANGED -eq 0 ]; then
+                echo "Bumping release counter..."
+                bump_release
+            else
+                echo "Skipping release bump (already reset by extension version change)"
+            fi
 
             echo "Committing and pushing..."
             commit_and_push "$(echo -e "$CHANGE_SUMMARY")"
