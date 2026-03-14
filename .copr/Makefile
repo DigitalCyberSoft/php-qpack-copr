@@ -14,6 +14,9 @@ srpm:
 	@echo "Output directory: $(outdir)"
 	@echo "Working directory: $$(pwd)"
 
+	# Install php-devel for version macros (php_major_version, php_minor_version)
+	dnf -y install php-devel
+
 	# Download php-qpack source
 	@echo "=== Downloading php-qpack $(QPACK_VERSION) ==="
 	curl -L -o php-qpack-$(QPACK_VERSION).tar.gz $(QPACK_URL) || exit 1
