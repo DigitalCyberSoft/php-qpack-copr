@@ -151,9 +151,18 @@ check_ext_version() {
     echo "  Extension version: ${new_ver} [saved: ${saved_ver:-none}]"
     if [ "$new_ver" != "$saved_ver" ] && [ -n "$saved_ver" ]; then
         echo "  Extension UPDATED: ${saved_ver} -> ${new_ver} (resetting release to 1)"
-        echo "1" > "$RELEASE_FILE"; echo "$new_ver" > "$EXT_VERSION_FILE"; return 0
+        # Persist only when applying: writing during --check-only made the
+        # later --update invocation see no delta, so a standalone extension
+        # bump never committed on its own.
+        if [ "$MODE" = "update" ] && [ $DRY_RUN -eq 0 ]; then
+            echo "1" > "$RELEASE_FILE"; echo "$new_ver" > "$EXT_VERSION_FILE"
+        fi
+        return 0
     fi
-    echo "$new_ver" > "$EXT_VERSION_FILE"; return 1
+    if [ "$MODE" = "update" ] && [ $DRY_RUN -eq 0 ]; then
+        echo "$new_ver" > "$EXT_VERSION_FILE"
+    fi
+    return 1
 }
 
 # Bump the release counter
