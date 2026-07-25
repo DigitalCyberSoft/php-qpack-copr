@@ -155,8 +155,17 @@ FOOTER
 # Check if extension version has changed on GitHub
 check_ext_version() {
     local new_ver
-    new_ver=$(curl -sf --connect-timeout 15 --max-time 60 --retry 3 --retry-all-errors "https://api.github.com/repos/${EXT_GITHUB_REPO}/releases/latest" 2>/dev/null | sed -n 's/.*"tag_name": *"v\?\([^"]*\)".*/\1/p')
-    if [ -z "$new_ver" ]; then echo "  Extension version: unknown (API error)"; return 1; fi
+    local auth=()
+    if [ -n "${GITHUB_TOKEN:-}" ]; then
+        auth=(-H "Authorization: Bearer ${GITHUB_TOKEN}")
+    fi
+    new_ver=$(curl -sf "${auth[@]}" --connect-timeout 15 --max-time 60 --retry 3 --retry-all-errors "https://api.github.com/repos/${EXT_GITHUB_REPO}/releases/latest" 2>/dev/null | sed -n 's/.*"tag_name": *"v\?\([^"]*\)".*/\1/p')
+    # Hard error: API unreachable. Treating this as "no change" would
+    # silently skip the extension check while the run reports success.
+    if [ -z "$new_ver" ]; then
+        echo "ERROR: could not determine extension version from GitHub API (${EXT_GITHUB_REPO})" >&2
+        exit 1
+    fi
     local saved_ver=""
     if [ -f "$EXT_VERSION_FILE" ]; then saved_ver=$(cat "$EXT_VERSION_FILE" | tr -d '[:space:]'); fi
     echo "  Extension version: ${new_ver} [saved: ${saved_ver:-none}]"
