@@ -53,7 +53,7 @@ fetch_spec() {
 
     if [ -z "${!cache_var}" ]; then
         local spec
-        spec=$(curl -sf --connect-timeout 15 --max-time 60 --retry 3 --retry-all-errors "https://src.fedoraproject.org/rpms/php/raw/${branch}/f/php.spec" 2>/dev/null) || true
+        spec=$(curl -sf --connect-timeout 15 --max-time 60 --retry 6 --retry-all-errors "https://src.fedoraproject.org/rpms/php/raw/${branch}/f/php.spec" 2>/dev/null) || true
         eval "${cache_var}=\"\${spec}\""
     fi
 
@@ -74,6 +74,7 @@ get_php_version() {
         return 0
     fi
 
+    echo "ERROR: could not get PHP version for ${branch} (spec fetch failed or upver missing)" >&2
     echo "unknown"
     return 1
 }
@@ -93,6 +94,7 @@ get_php_zendver() {
         return 0
     fi
 
+    echo "ERROR: could not get Zend ABI version for ${branch} (spec fetch failed or zendver missing)" >&2
     echo "unknown"
     return 1
 }
